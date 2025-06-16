@@ -44,6 +44,19 @@ private:
     }
 
 public:
+    static std::vector<std::string> loadLayoutFromFile(const std::string& filename) {
+        std::ifstream file(filename);
+        if (!file.is_open()) {
+            throw std::runtime_error("No se pudo abrir el archivo de mapa");
+        }
+        std::vector<std::string> layout;
+        std::string line;
+        while (std::getline(file, line)) {
+            if (!line.empty()) layout.push_back(line);
+        }
+        return layout;
+    }
+
     PentagonGrid(const std::vector<std::string>& layout, float radius, sf::Vector2u windowSize)
         : radius(radius) {
 
@@ -106,7 +119,6 @@ public:
 
         adjacencyList.resize(currentId);
 
-        // Vincular vecinos transitables
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
                 if (grid[i][j].blocked) continue;

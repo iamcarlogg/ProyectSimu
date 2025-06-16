@@ -1,1 +1,8 @@
-﻿  Simu.vcxproj -> C:\Users\carlo\Desktop\ProyectSimu\Simu\x64\Debug\Simu.exe
+﻿  main.cpp
+C:\Users\carlo\Desktop\ProyectSimu\Simu\Simu\PentagonGrid.h(63,27): warning C4267: '=': conversión de 'size_t' a 'int'; posible pérdida de datos
+  (compilando archivo de origen "main.cpp")
+  
+C:\Users\carlo\Desktop\ProyectSimu\Simu\Simu\PentagonGrid.h(64,31): warning C4267: '=': conversión de 'size_t' a 'int'; posible pérdida de datos
+  (compilando archivo de origen "main.cpp")
+  
+  Simu.vcxproj -> C:\Users\carlo\Desktop\ProyectSimu\Simu\x64\Debug\Simu.exe

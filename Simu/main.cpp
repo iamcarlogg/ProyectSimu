@@ -5,15 +5,7 @@
 int main() {
     sf::RenderWindow window(sf::VideoMode(1000, 800), "Pentagon Pathfinding Grid");
 
-    std::vector<std::string> layout = {
-        "1111111111",
-        "10a0000001",
-        "1011111101",
-        "1010000101",
-        "1010111101",
-        "10000000b1",
-        "1111111111"
-    };
+    auto layout = PentagonGrid::loadLayoutFromFile("map.txt");
 
     PentagonGrid grid(layout, 30.0f, window.getSize());
     //obtienes la lista de adyacencia
