@@ -16,6 +16,15 @@ int main() {
     };
 
     PentagonGrid grid(layout, 30.0f, window.getSize());
+    //obtienes la lista de adyacencia
+    auto& adj = grid.getAdjacencyList();
+    //obtienes nodo inicio
+    int from = grid.getPlayerNodeId();
+    //obtienes nodo final
+    int to = grid.getEndNodeId();
+    //exportar lista de adyacencia como txt
+    grid.exportAdjacencyListToFile("adyacencia.txt");
+
 
     sf::Event event;
     while (window.isOpen()) {

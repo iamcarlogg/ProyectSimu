@@ -1,14 +1,16 @@
-﻿#pragma once
-#include <SFML/Graphics.hpp>
+﻿#include <SFML/Graphics.hpp>
 #include <vector>
 #include <string>
 #include <cmath>
 #include <stdexcept>
+#include <fstream>
+#include <unordered_map>
 
 const float PI = 3.14159265f;
 
 struct PentagonCell {
     int row, col;
+    int id = -1;
     bool blocked = false;
     bool isStart = false;
     bool isEnd = false;
@@ -19,8 +21,12 @@ struct PentagonCell {
 class PentagonGrid {
 private:
     std::vector<std::vector<PentagonCell>> grid;
+    std::vector<std::vector<int>> adjacencyList;
+    std::unordered_map<int, PentagonCell*> idToCell;
     int rows, cols;
     float radius;
+    int playerNodeId = -1;
+    int endNodeId = -1;
     PentagonCell* startCell = nullptr;
     PentagonCell* playerCell = nullptr;
 
@@ -54,6 +60,7 @@ public:
         float offsetY = (windowSize.y - gridHeight) / 2.0f;
 
         grid.resize(rows, std::vector<PentagonCell>(cols));
+        int currentId = 0;
 
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
@@ -77,16 +84,27 @@ public:
                 cell.blocked = blocked;
                 cell.isStart = start;
                 cell.isEnd = end;
+                cell.id = blocked ? -1 : currentId;
                 cell.shape = createPentagon(x + offsetX, y + offsetY, radius, color);
 
-                grid[i][j] = cell;
-
-                if (start) {
-                    startCell = &grid[i][j];
-                    playerCell = startCell;
+                if (!blocked) {
+                    idToCell[currentId] = &grid[i][j];
+                    if (start) {
+                        startCell = &grid[i][j];
+                        playerCell = startCell;
+                        playerNodeId = currentId;
+                    }
+                    if (end) {
+                        endNodeId = currentId;
+                    }
+                    currentId++;
                 }
+
+                grid[i][j] = cell;
             }
         }
+
+        adjacencyList.resize(currentId);
 
         // Vincular vecinos transitables
         for (int i = 0; i < rows; i++) {
@@ -110,6 +128,7 @@ public:
                     if (ni >= 0 && ni < rows && nj >= 0 && nj < cols) {
                         if (!grid[ni][nj].blocked) {
                             grid[i][j].neighbors.push_back(&grid[ni][nj]);
+                            adjacencyList[grid[i][j].id].push_back(grid[ni][nj].id);
                         }
                     }
                 }
@@ -150,6 +169,7 @@ public:
                         for (PentagonCell* neighbor : playerCell->neighbors) {
                             if (neighbor == &cell) {
                                 playerCell = &cell;
+                                playerNodeId = cell.id;
                                 return;
                             }
                         }
@@ -157,5 +177,34 @@ public:
                 }
             }
         }
+    }
+
+    const std::vector<std::vector<int>>& getAdjacencyList() const {
+        return adjacencyList;
+    }
+
+    int getPlayerNodeId() const {
+        return playerNodeId;
+    }
+
+    int getEndNodeId() const {
+        return endNodeId;
+    }
+
+    void exportAdjacencyListToFile(const std::string& filename) const {
+        std::ofstream out(filename);
+        if (!out.is_open()) {
+            throw std::runtime_error("No se pudo abrir el archivo para escritura");
+        }
+
+        for (size_t i = 0; i < adjacencyList.size(); ++i) {
+            out << i << ": ";
+            for (int neighbor : adjacencyList[i]) {
+                out << neighbor << " ";
+            }
+            out << "\n";
+        }
+
+        out.close();
     }
 };
