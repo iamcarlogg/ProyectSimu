@@ -1,38 +1,31 @@
 ﻿#include <SFML/Graphics.hpp>
-#include "Simu/PentagonGrid.h"
-
+#include <vector>
+#include <string>
+#include <cmath>
+#include <stdexcept>
+#include <fstream>
+#include <unordered_map>
+#include "./Simu/PentagonGrid.h"
 
 int main() {
-    sf::RenderWindow window(sf::VideoMode(1000, 800), "Pentagon Pathfinding Grid");
+    sf::RenderWindow window(sf::VideoMode(1000, 800), "Laberinto de Pentágonos");
+    sf::Vector2u windowSize = window.getSize();
 
-    auto layout = PentagonGrid::loadLayoutFromFile("map.txt");
+    std::vector<std::string> layout = PentagonGrid::loadLayoutFromFile("map.txt");
+    PentagonGrid grid(layout, 30.0f, windowSize);
 
-    PentagonGrid grid(layout, 30.0f, window.getSize());
-    //obtienes la lista de adyacencia
-    auto& adj = grid.getAdjacencyList();
-    //obtienes nodo inicio
-    int from = grid.getPlayerNodeId();
-    //obtienes nodo final
-    int to = grid.getEndNodeId();
-    //exportar lista de adyacencia como txt
-    grid.exportAdjacencyListToFile("adyacencia.txt");
-
-
-    sf::Event event;
     while (window.isOpen()) {
+        sf::Event event;
         while (window.pollEvent(event)) {
             if (event.type == sf::Event::Closed)
                 window.close();
-
-            if (event.type == sf::Event::MouseButtonPressed) {
-                if (event.mouseButton.button == sf::Mouse::Left) {
-                    sf::Vector2f mousePos = window.mapPixelToCoords({ event.mouseButton.x, event.mouseButton.y });
-                    grid.handleMouseClick(mousePos);
-                }
+            else if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left) {
+                sf::Vector2f mousePos = window.mapPixelToCoords(sf::Mouse::getPosition(window));
+                grid.handleMouseClick(mousePos);
             }
         }
 
-        window.clear(sf::Color::Black);
+        window.clear();
         grid.draw(window);
         grid.drawPlayer(window);
         window.display();

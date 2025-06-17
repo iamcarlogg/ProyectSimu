@@ -1,10 +1,12 @@
-﻿#include <SFML/Graphics.hpp>
+﻿#pragma once
+
+#include <SFML/Graphics.hpp>
 #include <vector>
 #include <string>
 #include <cmath>
-#include <stdexcept>
 #include <fstream>
 #include <unordered_map>
+#include <stdexcept>
 
 const float PI = 3.14159265f;
 
@@ -14,6 +16,7 @@ struct PentagonCell {
     bool blocked = false;
     bool isStart = false;
     bool isEnd = false;
+    bool volatileCell = false;
     sf::ConvexShape shape;
     std::vector<PentagonCell*> neighbors;
 };
@@ -27,106 +30,62 @@ private:
     float radius;
     int playerNodeId = -1;
     int endNodeId = -1;
-    PentagonCell* startCell = nullptr;
     PentagonCell* playerCell = nullptr;
+    int moveCounter = 1;
+    int movesToBreak = 10;
+    int turnCounter = 0;
 
-    sf::ConvexShape createPentagon(float x, float y, float radius, sf::Color color) {
-        sf::ConvexShape pentagon;
-        pentagon.setPointCount(5);
-        for (int i = 0; i < 5; i++) {
+    sf::ConvexShape createPentagon(float x, float y, float r, sf::Color color) {
+        sf::ConvexShape pent;
+        pent.setPointCount(5);
+        for (int i = 0; i < 5; ++i) {
             float angle = 2 * PI * i / 5 - PI / 2;
-            float px = x + radius * cos(angle);
-            float py = y + radius * sin(angle);
-            pentagon.setPoint(i, sf::Vector2f(px, py));
+            pent.setPoint(i, { x + r * std::cos(angle), y + r * std::sin(angle) });
         }
-        pentagon.setFillColor(color);
-        return pentagon;
+        pent.setFillColor(color);
+        return pent;
     }
 
-public:
-    static std::vector<std::string> loadLayoutFromFile(const std::string& filename) {
-        std::ifstream file(filename);
-        if (!file.is_open()) {
-            throw std::runtime_error("No se pudo abrir el archivo de mapa");
-        }
-        std::vector<std::string> layout;
-        std::string line;
-        while (std::getline(file, line)) {
-            if (!line.empty()) layout.push_back(line);
-        }
-        return layout;
-    }
-
-    PentagonGrid(const std::vector<std::string>& layout, float radius, sf::Vector2u windowSize)
-        : radius(radius) {
-
-        rows = layout.size();
-        cols = layout.empty() ? 0 : layout[0].size();
-
-        float dx = radius * 1.75f;
-        float dy = radius * 1.5f;
-
-        float gridWidth = cols * dx + dx / 2;
-        float gridHeight = rows * dy;
-
-        float offsetX = (windowSize.x - gridWidth) / 2.0f;
-        float offsetY = (windowSize.y - gridHeight) / 2.0f;
-
-        grid.resize(rows, std::vector<PentagonCell>(cols));
-        int currentId = 0;
-
-        for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < cols; j++) {
-                if (j >= layout[i].size()) throw std::runtime_error("Layout string is too short");
-
-                char ch = layout[i][j];
-                bool blocked = ch == '0';
-                bool start = ch == 'a';
-                bool end = ch == 'b';
-
-                float x = j * dx + (i % 2) * (dx / 2);
-                float y = i * dy;
-
-                sf::Color color = blocked ? sf::Color::Red : sf::Color::White;
-                if (start) color = sf::Color::Blue;
-                if (end) color = sf::Color::Green;
-
-                PentagonCell cell;
-                cell.row = i;
-                cell.col = j;
-                cell.blocked = blocked;
-                cell.isStart = start;
-                cell.isEnd = end;
-                cell.id = blocked ? -1 : currentId;
-                cell.shape = createPentagon(x + offsetX, y + offsetY, radius, color);
-
-                if (!blocked) {
-                    idToCell[currentId] = &grid[i][j];
-                    if (start) {
-                        startCell = &grid[i][j];
-                        playerCell = startCell;
-                        playerNodeId = currentId;
+    void rebuildAdjacency() {
+        // 1) Actualizar volatileCell: bloqueado + color
+        for (auto& row : grid) {
+            for (auto& cell : row) {
+                if (cell.volatileCell) {
+                    if (turnCounter % 2 == 0) {
+                        cell.blocked = true;
+                        cell.shape.setFillColor(sf::Color(100, 0, 0));
                     }
-                    if (end) {
-                        endNodeId = currentId;
+                    else {
+                        cell.blocked = false;
+                        cell.shape.setFillColor(sf::Color(150, 150, 255));
                     }
-                    currentId++;
                 }
-
-                grid[i][j] = cell;
             }
         }
 
-        adjacencyList.resize(currentId);
+        // 2) Limpiar vecinos y lista de adyacencia
+        for (auto& row : grid)
+            for (auto& cell : row)
+                cell.neighbors.clear();
+        for (auto& lst : adjacencyList)
+            lst.clear();
 
-        for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < cols; j++) {
-                if (grid[i][j].blocked) continue;
+        // 3) Reconstruir adyacencia, PERMITIENDO que la celda del jugador
+        // siempre conserve vecinos aunque esté bloqueada
+        auto isNav = [&](const PentagonCell& c) {
+            if (&c == playerCell) return true;
+            return !c.blocked;
+            };
+
+        for (int i = 0; i < rows; ++i) {
+            for (int j = 0; j < cols; ++j) {
+                PentagonCell& c = grid[i][j];
+                if (c.id < 0 || !isNav(c)) continue;
 
                 std::vector<std::pair<int, int>> dirs = {
-                    {i, j - 1}, {i, j + 1}, {i - 1, j}, {i + 1, j}
+                    {i, j - 1}, {i, j + 1},
+                    {i - 1, j}, {i + 1, j}
                 };
-
                 if (i % 2 == 0) {
                     dirs.push_back({ i - 1, j - 1 });
                     dirs.push_back({ i + 1, j - 1 });
@@ -136,11 +95,12 @@ public:
                     dirs.push_back({ i + 1, j + 1 });
                 }
 
-                for (auto& [ni, nj] : dirs) {
+                for (auto [ni, nj] : dirs) {
                     if (ni >= 0 && ni < rows && nj >= 0 && nj < cols) {
-                        if (!grid[ni][nj].blocked) {
-                            grid[i][j].neighbors.push_back(&grid[ni][nj]);
-                            adjacencyList[grid[i][j].id].push_back(grid[ni][nj].id);
+                        PentagonCell& n = grid[ni][nj];
+                        if (n.id >= 0 && isNav(n)) {
+                            c.neighbors.push_back(&n);
+                            adjacencyList[c.id].push_back(n.id);
                         }
                     }
                 }
@@ -148,75 +108,118 @@ public:
         }
     }
 
-    void draw(sf::RenderWindow& window) {
-        for (const auto& row : grid) {
-            for (const auto& cell : row) {
-                window.draw(cell.shape);
+public:
+    static std::vector<std::string> loadLayoutFromFile(const std::string& filename) {
+        std::ifstream f(filename);
+        if (!f.is_open()) throw std::runtime_error("No se pudo abrir el archivo");
+        std::vector<std::string> lay; std::string line;
+        while (std::getline(f, line))
+            if (!line.empty()) lay.push_back(line);
+        return lay;
+    }
+
+    PentagonGrid(const std::vector<std::string>& layout, float r, sf::Vector2u wsize)
+        : radius(r)
+    {
+        rows = layout.size();
+        cols = layout.empty() ? 0 : layout[0].size();
+
+        float dx = r * 1.75f, dy = r * 1.5f;
+        float gw = cols * dx + dx / 2, gh = rows * dy;
+        float offX = (wsize.x - gw) / 2, offY = (wsize.y - gh) / 2;
+
+        grid.assign(rows, std::vector<PentagonCell>(cols));
+        int idcnt = 0;
+        for (int i = 0; i < rows; ++i) {
+            for (int j = 0; j < cols; ++j) {
+                char ch = layout[i][j];
+                bool blk = (ch == '0');
+                bool st = (ch == 'a');
+                bool en = (ch == 'b');
+                bool vc = (ch == 'v');
+
+                float x = j * dx + (i % 2) * (dx / 2) + offX;
+                float y = i * dy + offY;
+                sf::Color col = blk ? sf::Color::Red : sf::Color::White;
+                if (st) col = sf::Color::Blue;
+                if (en) col = sf::Color::Green;
+                if (vc) col = sf::Color(150, 150, 255);
+
+                PentagonCell& cell = grid[i][j];
+                cell.row = i; cell.col = j;
+                cell.blocked = blk; cell.volatileCell = vc;
+                cell.isStart = st; cell.isEnd = en;
+                cell.id = (!blk || vc) ? idcnt : -1;
+                cell.shape = createPentagon(x, y, r, col);
+
+                if (cell.id >= 0) {
+                    idToCell[idcnt] = &cell;
+                    if (st) { playerCell = &cell; playerNodeId = idcnt; }
+                    if (en)  endNodeId = idcnt;
+                    ++idcnt;
+                }
             }
         }
+        adjacencyList.assign(idcnt, {});
+        rebuildAdjacency();
     }
 
-    void drawPlayer(sf::RenderWindow& window) {
-        if (playerCell) {
-            sf::CircleShape player(radius * 0.5f);
-            player.setFillColor(sf::Color::Yellow);
-            player.setOrigin(player.getRadius(), player.getRadius());
+    void draw(sf::RenderWindow& w) {
+        for (auto& row : grid)
+            for (auto& c : row)
+                w.draw(c.shape);
 
-            sf::Vector2f center = playerCell->shape.getPoint(0);
-            for (int i = 1; i < 5; i++)
-                center += playerCell->shape.getPoint(i);
-            center.x /= 5;
-            center.y /= 5;
+        float pct = std::min(1.f, moveCounter / (float)movesToBreak);
+        sf::RectangleShape bg({ 200,20 }), fg({ 200 * pct,20 });
+        bg.setPosition(20, 20); fg.setPosition(20, 20);
+        bg.setFillColor({ 50,50,50 }); fg.setFillColor(sf::Color::Yellow);
+        w.draw(bg); w.draw(fg);
 
-            player.setPosition(center);
-            window.draw(player);
-        }
+        sf::Font f; f.loadFromFile("arial.ttf");
+        sf::Text t("Turno: " + std::to_string(turnCounter), f, 16);
+        t.setPosition(20, 50); t.setFillColor(sf::Color::White);
+        w.draw(t);
     }
 
-    void handleMouseClick(sf::Vector2f mousePos) {
+    void drawPlayer(sf::RenderWindow& w) {
+        if (!playerCell) return;
+        sf::CircleShape pl(radius / 2);
+        pl.setFillColor(sf::Color::Yellow);
+        pl.setOrigin(pl.getRadius(), pl.getRadius());
+        sf::Vector2f ctr = playerCell->shape.getPoint(0);
+        for (int i = 1; i < 5; ++i) ctr += playerCell->shape.getPoint(i);
+        ctr /= 5.f;
+        pl.setPosition(ctr);
+        w.draw(pl);
+    }
+
+    void handleMouseClick(sf::Vector2f mp) {
+        // Primero, romper muro si cabe
         for (auto& row : grid) {
-            for (auto& cell : row) {
-                if (!cell.blocked && playerCell) {
-                    if (cell.shape.getGlobalBounds().contains(mousePos)) {
-                        for (PentagonCell* neighbor : playerCell->neighbors) {
-                            if (neighbor == &cell) {
-                                playerCell = &cell;
-                                playerNodeId = cell.id;
-                                return;
-                            }
-                        }
-                    }
+            for (auto& c : row) {
+                if (c.shape.getGlobalBounds().contains(mp) && c.blocked && moveCounter >= movesToBreak) {
+                    c.blocked = false;
+                    c.shape.setFillColor(sf::Color::White);
+                    c.id = adjacencyList.size();
+                    idToCell[c.id] = &c;
+                    adjacencyList.emplace_back();
+                    moveCounter = 0;
+                    rebuildAdjacency();
+                    return;
                 }
             }
         }
-    }
-
-    const std::vector<std::vector<int>>& getAdjacencyList() const {
-        return adjacencyList;
-    }
-
-    int getPlayerNodeId() const {
-        return playerNodeId;
-    }
-
-    int getEndNodeId() const {
-        return endNodeId;
-    }
-
-    void exportAdjacencyListToFile(const std::string& filename) const {
-        std::ofstream out(filename);
-        if (!out.is_open()) {
-            throw std::runtime_error("No se pudo abrir el archivo para escritura");
-        }
-
-        for (size_t i = 0; i < adjacencyList.size(); ++i) {
-            out << i << ": ";
-            for (int neighbor : adjacencyList[i]) {
-                out << neighbor << " ";
+        // Luego, mover jugador
+        for (int nid : adjacencyList[playerNodeId]) {
+            PentagonCell* n = idToCell[nid];
+            if (n->shape.getGlobalBounds().contains(mp)) {
+                playerCell = n;
+                playerNodeId = n->id;
+                ++moveCounter;
+                ++turnCounter;
+                rebuildAdjacency();
+                return;
             }
-            out << "\n";
         }
-
-        out.close();
     }
 };

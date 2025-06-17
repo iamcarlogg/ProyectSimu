@@ -16,6 +16,7 @@ Cada línea del archivo representa una fila de la cuadrícula. Los caracteres pe
 
 - `1` - Pentágono transitable
 - `0` - Pentágono bloqueado (muro)
+- `v` - Pentágono volatil (transitable en turno impar e intransitable en turno par)
 - `a` - Nodo de inicio (jugador comienza aquí)
 - `b` - Nodo destino (meta)
 
@@ -24,7 +25,7 @@ Cada línea del archivo representa una fila de la cuadrícula. Los caracteres pe
 ```
 111111
 10a011
-101011
+101v11
 10b011
 111111
 ```
