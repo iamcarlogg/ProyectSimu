@@ -7,11 +7,12 @@
 #include <fstream>
 #include <unordered_map>
 #include <stdexcept>
+#include <iostream>
 
-const float PI = 3.14159265f;
+static constexpr float PI = 3.14159265f;
 
 struct PentagonCell {
-    int row, col;
+    int row = 0, col = 0;
     int id = -1;
     bool blocked = false;
     bool isStart = false;
@@ -26,14 +27,18 @@ private:
     std::vector<std::vector<PentagonCell>> grid;
     std::vector<std::vector<int>> adjacencyList;
     std::unordered_map<int, PentagonCell*> idToCell;
-    int rows, cols;
-    float radius;
+    int rows = 0, cols = 0;
+    float radius = 0.f;
     int playerNodeId = -1;
     int endNodeId = -1;
     PentagonCell* playerCell = nullptr;
     int moveCounter = 1;
     int movesToBreak = 10;
     int turnCounter = 0;
+
+    // **Font** cargada una sola vez
+    sf::Font font_;
+    bool fontLoaded_ = false;
 
     sf::ConvexShape createPentagon(float x, float y, float r, sf::Color color) {
         sf::ConvexShape pent;
@@ -43,11 +48,13 @@ private:
             pent.setPoint(i, { x + r * std::cos(angle), y + r * std::sin(angle) });
         }
         pent.setFillColor(color);
+        pent.setOutlineColor(sf::Color::White);
+        pent.setOutlineThickness(1.f);
         return pent;
     }
 
     void rebuildAdjacency() {
-        // 1) Actualizar volatileCell: bloqueado + color
+        // 1) Actualizar células volátiles
         for (auto& row : grid) {
             for (auto& cell : row) {
                 if (cell.volatileCell) {
@@ -63,15 +70,14 @@ private:
             }
         }
 
-        // 2) Limpiar vecinos y lista de adyacencia
+        // 2) Limpiar
         for (auto& row : grid)
             for (auto& cell : row)
                 cell.neighbors.clear();
         for (auto& lst : adjacencyList)
             lst.clear();
 
-        // 3) Reconstruir adyacencia, PERMITIENDO que la celda del jugador
-        // siempre conserve vecinos aunque esté bloqueada
+        // 3) Reconstruir
         auto isNav = [&](const PentagonCell& c) {
             if (&c == playerCell) return true;
             return !c.blocked;
@@ -79,7 +85,7 @@ private:
 
         for (int i = 0; i < rows; ++i) {
             for (int j = 0; j < cols; ++j) {
-                PentagonCell& c = grid[i][j];
+                auto& c = grid[i][j];
                 if (c.id < 0 || !isNav(c)) continue;
 
                 std::vector<std::pair<int, int>> dirs = {
@@ -97,7 +103,7 @@ private:
 
                 for (auto [ni, nj] : dirs) {
                     if (ni >= 0 && ni < rows && nj >= 0 && nj < cols) {
-                        PentagonCell& n = grid[ni][nj];
+                        auto& n = grid[ni][nj];
                         if (n.id >= 0 && isNav(n)) {
                             c.neighbors.push_back(&n);
                             adjacencyList[c.id].push_back(n.id);
@@ -121,6 +127,12 @@ public:
     PentagonGrid(const std::vector<std::string>& layout, float r, sf::Vector2u wsize)
         : radius(r)
     {
+        // Carga de fuente **UNA VEZ**
+        fontLoaded_ = font_.loadFromFile("arial.ttf");
+        if (!fontLoaded_) {
+            std::cerr << "Warning: no se pudo cargar arial.ttf\n";
+        }
+
         rows = layout.size();
         cols = layout.empty() ? 0 : layout[0].size();
 
@@ -145,7 +157,7 @@ public:
                 if (en) col = sf::Color::Green;
                 if (vc) col = sf::Color(150, 150, 255);
 
-                PentagonCell& cell = grid[i][j];
+                auto& cell = grid[i][j];
                 cell.row = i; cell.col = j;
                 cell.blocked = blk; cell.volatileCell = vc;
                 cell.isStart = st; cell.isEnd = en;
@@ -165,20 +177,28 @@ public:
     }
 
     void draw(sf::RenderWindow& w) {
+        // Pentágonos
         for (auto& row : grid)
             for (auto& c : row)
                 w.draw(c.shape);
 
+        // Barra de carga
         float pct = std::min(1.f, moveCounter / (float)movesToBreak);
         sf::RectangleShape bg({ 200,20 }), fg({ 200 * pct,20 });
         bg.setPosition(20, 20); fg.setPosition(20, 20);
         bg.setFillColor({ 50,50,50 }); fg.setFillColor(sf::Color::Yellow);
         w.draw(bg); w.draw(fg);
 
-        sf::Font f; f.loadFromFile("arial.ttf");
-        sf::Text t("Turno: " + std::to_string(turnCounter), f, 16);
-        t.setPosition(20, 50); t.setFillColor(sf::Color::White);
-        w.draw(t);
+        // Texto de turno
+        if (fontLoaded_) {
+            sf::Text t;
+            t.setFont(font_);
+            t.setCharacterSize(16);
+            t.setFillColor(sf::Color::White);
+            t.setString("Turno: " + std::to_string(turnCounter));
+            t.setPosition(10, 40);
+            w.draw(t);
+        }
     }
 
     void drawPlayer(sf::RenderWindow& w) {
@@ -194,10 +214,11 @@ public:
     }
 
     void handleMouseClick(sf::Vector2f mp) {
-        // Primero, romper muro si cabe
+        // Romper muro
         for (auto& row : grid) {
             for (auto& c : row) {
-                if (c.shape.getGlobalBounds().contains(mp) && c.blocked && moveCounter >= movesToBreak) {
+                if (c.shape.getGlobalBounds().contains(mp)
+                    && c.blocked && moveCounter >= movesToBreak) {
                     c.blocked = false;
                     c.shape.setFillColor(sf::Color::White);
                     c.id = adjacencyList.size();
@@ -209,9 +230,9 @@ public:
                 }
             }
         }
-        // Luego, mover jugador
+        // Mover jugador
         for (int nid : adjacencyList[playerNodeId]) {
-            PentagonCell* n = idToCell[nid];
+            auto* n = idToCell[nid];
             if (n->shape.getGlobalBounds().contains(mp)) {
                 playerCell = n;
                 playerNodeId = n->id;
