@@ -32,7 +32,7 @@ private:
     int playerNodeId = -1;
     int endNodeId = -1;
     PentagonCell* playerCell = nullptr;
-    int moveCounter = 1;
+    int moveCounter = 0;
     int movesToBreak = 10;
     int turnCounter = 0;
 

@@ -1,0 +1,45 @@
+# --- Binarios y objetos ---
+*.o
+*.obj
+*.exe
+*.out
+*.dll
+*.lib
+
+# Directorios de build
+/build/
+/bin/
+/obj/
+
+# Archivos de Visual Studio
+*.sln
+*.vcxproj*
+*.vcxproj.user
+*.vcxproj.filters
+*.vcxproj.*.user
+*.vcxproj.*.user.*
+*.suo
+*.sdf
+*.opensdf
+
+# Archivos de CMake (si usas CMake)
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+install_manifest.txt
+
+# Config de editores
+.vscode/
+.idea/
+.vs/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Archivos temporales
+*~
