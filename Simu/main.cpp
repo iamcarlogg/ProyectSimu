@@ -75,34 +75,32 @@ int main() {
     sf::Clock autoClock;
 
     while (window.isOpen()) {
+        window.setView(view); 
         sf::Event ev;
         while (window.pollEvent(ev)) {
             if (ev.type == sf::Event::Closed)
                 window.close();
 
             else if (ev.type == sf::Event::MouseButtonPressed && ev.mouseButton.button == sf::Mouse::Left) {
-                sf::Vector2f mpScreen(ev.mouseButton.x, ev.mouseButton.y);
+                // 1. Coordenada de pantalla (pixel, para botones/HUD)
+                sf::Vector2i mpScreen(ev.mouseButton.x, ev.mouseButton.y);
 
-                // Modal de fin de juego
+                // 2. HUD/Botones
                 if (grid.isGameFinished()) {
-                    if (replayBtn.getGlobalBounds().contains(mpScreen)) {
+                    if (replayBtn.getGlobalBounds().contains(sf::Vector2f(mpScreen))) {
                         grid.resetGame();
                         continue;
                     }
-                    else if (exitBtn.getGlobalBounds().contains(mpScreen)) {
+                    else if (exitBtn.getGlobalBounds().contains(sf::Vector2f(mpScreen))) {
                         window.close();
                         continue;
                     }
                 }
-
-                // Botón de reinicio
-                if (restartButton.getGlobalBounds().contains(mpScreen)) {
+                if (restartButton.getGlobalBounds().contains(sf::Vector2f(mpScreen))) {
                     grid.resetGame();
                     continue;
                 }
-
-                // Botón "Autocompletar"
-                if (btn.getGlobalBounds().contains(mpScreen)) {
+                if (btn.getGlobalBounds().contains(sf::Vector2f(mpScreen))) {
                     path = grid.solveWithBFS();
                     if (path.empty())
                         std::cout << "¡No hay ruta!\n";
@@ -112,10 +110,10 @@ int main() {
                         autoClock.restart();
                     }
                 }
-                // Click en el grid (convertir a coordenadas de la vista)
-                else if (!autoMode && !grid.isGameFinished()) {
-                    sf::Vector2f mp = window.mapPixelToCoords({ ev.mouseButton.x, ev.mouseButton.y });
-                    grid.handleMouseClick(mp);
+                // 3. Click en el grid/laberinto (convertir a coords de mundo)
+                else if (!grid.isGameFinished()) {
+                    sf::Vector2f worldPos = window.mapPixelToCoords(mpScreen);
+                    grid.handleMouseClick(worldPos);
                 }
             }
 
