@@ -129,7 +129,7 @@ public:
 
         rows = layout.size();
         cols = layout.empty() ? 0 : layout[0].size();
-        float dx = r * 2.0f, dy = r * 1.7f;
+        float dx = r * 2.1f, dy = r * 1.8f;
         float gw = cols * dx + dx / 2, gh = rows * dy;
         float offX = (wsize.x - gw) / 2, offY = (wsize.y - gh) / 2;
 
