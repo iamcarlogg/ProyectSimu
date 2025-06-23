@@ -1,11 +1,33 @@
 ﻿  main.cpp
-C:\Users\carlo\Desktop\ProyectSimu\Simu\Simu\PentagonGrid.h(136,27): warning C4267: '=': conversión de 'size_t' a 'int'; posible pérdida de datos
+C:\Users\isira\Desktop\Proyecto Simu\a\ProyectSimu\Simu\Simu\PentagonGrid.h(140,27): warning C4267: '=': conversión de 'size_t' a 'int'; posible pérdida de datos
   (compilando archivo de origen "main.cpp")
   
-C:\Users\carlo\Desktop\ProyectSimu\Simu\Simu\PentagonGrid.h(137,31): warning C4267: '=': conversión de 'size_t' a 'int'; posible pérdida de datos
+C:\Users\isira\Desktop\Proyecto Simu\a\ProyectSimu\Simu\Simu\PentagonGrid.h(141,28): warning C4267: '=': conversión de 'size_t' a 'int'; posible pérdida de datos
   (compilando archivo de origen "main.cpp")
   
-C:\Users\carlo\Desktop\ProyectSimu\Simu\Simu\PentagonGrid.h(224,46): warning C4267: '=': conversión de 'size_t' a 'int'; posible pérdida de datos
+C:\Users\isira\Desktop\Proyecto Simu\a\ProyectSimu\Simu\Simu\PentagonGrid.h(265,77): warning C4244: 'argumento': conversión de 'T' a 'T'; posible pérdida de datos
+C:\Users\isira\Desktop\Proyecto Simu\a\ProyectSimu\Simu\Simu\PentagonGrid.h(265,77): warning C4244:         with
+C:\Users\isira\Desktop\Proyecto Simu\a\ProyectSimu\Simu\Simu\PentagonGrid.h(265,77): warning C4244:         [
+C:\Users\isira\Desktop\Proyecto Simu\a\ProyectSimu\Simu\Simu\PentagonGrid.h(265,77): warning C4244:             T=unsigned int
+C:\Users\isira\Desktop\Proyecto Simu\a\ProyectSimu\Simu\Simu\PentagonGrid.h(265,77): warning C4244:         ]
+C:\Users\isira\Desktop\Proyecto Simu\a\ProyectSimu\Simu\Simu\PentagonGrid.h(265,77): warning C4244:         and
+C:\Users\isira\Desktop\Proyecto Simu\a\ProyectSimu\Simu\Simu\PentagonGrid.h(265,77): warning C4244:         [
+C:\Users\isira\Desktop\Proyecto Simu\a\ProyectSimu\Simu\Simu\PentagonGrid.h(265,77): warning C4244:             T=float
+C:\Users\isira\Desktop\Proyecto Simu\a\ProyectSimu\Simu\Simu\PentagonGrid.h(265,77): warning C4244:         ]
   (compilando archivo de origen "main.cpp")
   
-  Simu.vcxproj -> C:\Users\carlo\Desktop\ProyectSimu\Simu\x64\Debug\Simu.exe
+C:\Users\isira\Desktop\Proyecto Simu\a\ProyectSimu\Simu\Simu\PentagonGrid.h(265,63): warning C4244: 'argumento': conversión de 'T' a 'T'; posible pérdida de datos
+C:\Users\isira\Desktop\Proyecto Simu\a\ProyectSimu\Simu\Simu\PentagonGrid.h(265,63): warning C4244:         with
+C:\Users\isira\Desktop\Proyecto Simu\a\ProyectSimu\Simu\Simu\PentagonGrid.h(265,63): warning C4244:         [
+C:\Users\isira\Desktop\Proyecto Simu\a\ProyectSimu\Simu\Simu\PentagonGrid.h(265,63): warning C4244:             T=unsigned int
+C:\Users\isira\Desktop\Proyecto Simu\a\ProyectSimu\Simu\Simu\PentagonGrid.h(265,63): warning C4244:         ]
+C:\Users\isira\Desktop\Proyecto Simu\a\ProyectSimu\Simu\Simu\PentagonGrid.h(265,63): warning C4244:         and
+C:\Users\isira\Desktop\Proyecto Simu\a\ProyectSimu\Simu\Simu\PentagonGrid.h(265,63): warning C4244:         [
+C:\Users\isira\Desktop\Proyecto Simu\a\ProyectSimu\Simu\Simu\PentagonGrid.h(265,63): warning C4244:             T=float
+C:\Users\isira\Desktop\Proyecto Simu\a\ProyectSimu\Simu\Simu\PentagonGrid.h(265,63): warning C4244:         ]
+  (compilando archivo de origen "main.cpp")
+  
+C:\Users\isira\Desktop\Proyecto Simu\a\ProyectSimu\Simu\Simu\PentagonGrid.h(362,46): warning C4267: '=': conversión de 'size_t' a 'int'; posible pérdida de datos
+  (compilando archivo de origen "main.cpp")
+  
+  Simu.vcxproj -> C:\Users\isira\Desktop\Proyecto Simu\a\ProyectSimu\Simu\x64\Debug\Simu.exe

@@ -27,8 +27,12 @@ private:
     std::vector<std::vector<PentagonCell>> grid;
     std::vector<std::vector<int>> adjacencyList;
     std::unordered_map<int, PentagonCell*> idToCell;
+    sf::Vector2u windowSize;
+    std::vector<std::string> originalLayout;
+    sf::RenderWindow* windowRef = nullptr;
     int rows = 0, cols = 0;
     float radius = 0.f;
+    bool gameFinished = false;
     int playerNodeId = -1;
     int endNodeId = -1;
     PentagonCell* playerCell = nullptr;
@@ -124,8 +128,8 @@ public:
         return lay;
     }
 
-    PentagonGrid(const std::vector<std::string>& layout, float r, sf::Vector2u wsize)
-        : radius(r)
+    PentagonGrid(const std::vector<std::string>& layout, float r, sf::Vector2u wsize, sf::RenderWindow* w)
+        : radius(r), windowSize(wsize), originalLayout(layout), windowRef(w)
     {
         // Carga de fuente **UNA VEZ**
         fontLoaded_ = font_.loadFromFile("arial.ttf");
@@ -152,10 +156,10 @@ public:
 
                 float x = j * dx + (i % 2) * (dx / 2) + offX;
                 float y = i * dy + offY;
-                sf::Color col = blk ? sf::Color::Red : sf::Color::White;
-                if (st) col = sf::Color::Blue;
-                if (en) col = sf::Color::Green;
-                if (vc) col = sf::Color(150, 150, 255);
+                sf::Color col = blk ? sf::Color(28, 34, 50) : sf::Color(46, 58, 89);
+                if (st) col = sf::Color(0, 245, 212);
+                if (en) col = sf::Color(255, 78, 205);
+                if (vc) col = sf::Color(90, 200, 250);
 
                 auto& cell = grid[i][j];
                 cell.row = i; cell.col = j;
@@ -176,11 +180,31 @@ public:
         rebuildAdjacency();
     }
 
+    void resetGame() {
+        *this = PentagonGrid(originalLayout, radius, windowSize, windowRef);
+        gameFinished = false;
+    }
+
     void draw(sf::RenderWindow& w) {
-        // Pentágonos
-        for (auto& row : grid)
-            for (auto& c : row)
+        sf::Vector2i mousePosI = sf::Mouse::getPosition(*windowRef);
+        sf::Vector2f mousePos = w.mapPixelToCoords(mousePosI);
+
+        // Pentagonos
+        for (auto& row : grid) {
+            for (auto& c : row) {
+                // Resaltado si es la celda actual del jugador
+                if (&c == playerCell) {
+                    c.shape.setOutlineColor(sf::Color(0, 255, 255)); // cian brillante
+                    c.shape.setOutlineThickness(4.f);
+                }
+                else {
+                    c.shape.setOutlineColor(sf::Color(100, 100, 100));
+                    c.shape.setOutlineThickness(1.5f);
+                }
+
                 w.draw(c.shape);
+            }
+        }
 
         // Barra de carga
         float pct = std::min(1.f, moveCounter / (float)movesToBreak);
@@ -199,10 +223,102 @@ public:
             t.setPosition(10, 40);
             w.draw(t);
         }
+
+        // Boton de autocompletado
+        sf::RectangleShape autoButton({ 150.f, 30.f });
+        autoButton.setPosition(windowSize.x - 300.f, 20.f); 
+
+        bool hoveringAuto = autoButton.getGlobalBounds().contains(mousePos);
+
+        autoButton.setFillColor(hoveringAuto ? sf::Color(38, 44, 60) : sf::Color(28, 34, 50));
+        autoButton.setOutlineColor(hoveringAuto ? sf::Color::White : sf::Color(90, 200, 250));
+        autoButton.setOutlineThickness(2.f);
+        w.draw(autoButton);
+
+        sf::Text autoText("Autocompletado", font_, 16);
+        autoText.setFillColor(sf::Color(0, 245, 212));
+        autoText.setPosition(windowSize.x - 280.f, 26.f); 
+        w.draw(autoText);
+
+        // Boton de reinicio 
+        sf::RectangleShape restartButton({ 120.f, 30.f });
+        restartButton.setPosition(windowSize.x - 140.f, 20.f);
+
+        bool hoveringRestart = restartButton.getGlobalBounds().contains(mousePos);
+
+        restartButton.setFillColor(hoveringRestart ? sf::Color(38, 44, 60) : sf::Color(28, 34, 50));
+        restartButton.setOutlineColor(hoveringRestart ? sf::Color::White : sf::Color(90, 200, 250));
+        restartButton.setOutlineThickness(2.f);
+        w.draw(restartButton);
+
+        sf::Font f; f.loadFromFile("arial.ttf");
+        sf::Text restartText("Reiniciar", f, 16);
+        restartText.setFillColor(sf::Color(0, 245, 212));
+        restartText.setPosition(windowSize.x - 120.f, 26.f); 
+        w.draw(restartText);
+
+        if (gameFinished) {
+            sf::Font f;
+            f.loadFromFile("arial.ttf");
+
+            // Fondo semi-transparente
+            sf::RectangleShape overlay(sf::Vector2f(windowSize.x, windowSize.y));
+            overlay.setFillColor(sf::Color(0, 0, 0, 180)); 
+            w.draw(overlay);
+
+            // Ventana centrada estilo modal
+            sf::RectangleShape modal({ 400.f, 200.f });
+            modal.setFillColor(sf::Color(28, 34, 50));
+            modal.setOutlineColor(sf::Color(90, 200, 250));
+            modal.setOutlineThickness(3.f);
+            modal.setPosition((windowSize.x - 400.f) / 2.f, (windowSize.y - 200.f) / 2.f);
+            w.draw(modal);
+
+            // Mensaje de escape
+            sf::Text msg("¡Has escapado del laberinto!", f, 20);
+            msg.setFillColor(sf::Color(0, 245, 212));
+            msg.setStyle(sf::Text::Bold);
+            sf::FloatRect msgBounds = msg.getLocalBounds();
+            msg.setOrigin(msgBounds.width / 2, msgBounds.height / 2);
+            msg.setPosition(windowSize.x / 2.f, windowSize.y / 2.f - 40.f);
+            w.draw(msg);
+
+            // Botón jugar de nuevo
+            sf::RectangleShape replayBtn({ 180.f, 40.f });
+            replayBtn.setPosition(windowSize.x / 2.f - 90.f, windowSize.y / 2.f + 20.f);
+            bool hoveringReplay = replayBtn.getGlobalBounds().contains(mousePos);
+            replayBtn.setFillColor(hoveringReplay ? sf::Color(32, 40, 60) : sf::Color(20, 25, 40));
+            replayBtn.setOutlineColor(hoveringReplay ? sf::Color::White : sf::Color(90, 200, 250));
+            replayBtn.setOutlineThickness(2.f);
+            w.draw(replayBtn);
+
+            sf::Text replayText("Jugar de nuevo", f, 16);
+            replayText.setFillColor(sf::Color(0, 245, 212));
+            sf::FloatRect tb = replayText.getLocalBounds();
+            replayText.setOrigin(tb.width / 2.f, tb.height / 2.f);
+            replayText.setPosition(windowSize.x / 2.f, windowSize.y / 2.f + 40.f);
+            w.draw(replayText);
+
+            // Botón para salir del juego
+            sf::RectangleShape exitBtn({ 180.f, 40.f });
+            exitBtn.setPosition(windowSize.x / 2.f - 90.f, windowSize.y / 2.f + 70.f);
+            bool hoveringExit = exitBtn.getGlobalBounds().contains(mousePos);
+            exitBtn.setFillColor(hoveringExit ? sf::Color(40, 20, 20) : sf::Color(20, 25, 40));
+            exitBtn.setOutlineColor(hoveringExit ? sf::Color::White : sf::Color(255, 80, 80));
+            exitBtn.setOutlineThickness(2.f);
+            w.draw(exitBtn);
+
+            sf::Text exitText("Salir del juego", f, 16);
+            exitText.setFillColor(sf::Color(255, 80, 80));
+            sf::FloatRect etb = exitText.getLocalBounds();
+            exitText.setOrigin(etb.width / 2.f, etb.height / 2.f);
+            exitText.setPosition(windowSize.x / 2.f, windowSize.y / 2.f + 90.f);
+            w.draw(exitText);
+        }
     }
 
     void drawPlayer(sf::RenderWindow& w) {
-        if (!playerCell) return;
+        if (!playerCell || gameFinished) return;
         sf::CircleShape pl(radius / 2);
         pl.setFillColor(sf::Color::Yellow);
         pl.setOrigin(pl.getRadius(), pl.getRadius());
@@ -214,13 +330,35 @@ public:
     }
 
     void handleMouseClick(sf::Vector2f mp) {
+
+        if (gameFinished) {
+            sf::FloatRect replayBounds(windowSize.x / 2.f - 90.f, windowSize.y / 2.f + 20.f, 180.f, 40.f);
+            sf::FloatRect exitBounds(windowSize.x / 2.f - 90.f, windowSize.y / 2.f + 70.f, 180.f, 40.f);
+
+            if (replayBounds.contains(mp)) {
+                resetGame();
+            }
+            else if (exitBounds.contains(mp)) {
+                if (windowRef)
+                    windowRef->close();
+            }
+            return;
+        }
+
+        // Reiniciar juego
+        sf::FloatRect restartBounds(windowSize.x - 140.f, 20.f, 120.f, 30.f);
+        if (restartBounds.contains(mp)) {
+            resetGame();
+            return;
+        }
+
         // Romper muro
         for (auto& row : grid) {
             for (auto& c : row) {
                 if (c.shape.getGlobalBounds().contains(mp)
                     && c.blocked && moveCounter >= movesToBreak) {
                     c.blocked = false;
-                    c.shape.setFillColor(sf::Color::White);
+                    c.shape.setFillColor(sf::Color(46, 58, 89)); 
                     c.id = adjacencyList.size();
                     idToCell[c.id] = &c;
                     adjacencyList.emplace_back();
@@ -239,8 +377,13 @@ public:
                 ++moveCounter;
                 ++turnCounter;
                 rebuildAdjacency();
+
+                if (n->isEnd) {
+                    gameFinished = true;
+                }
                 return;
             }
         }
-    }
+    }   
 };
+
