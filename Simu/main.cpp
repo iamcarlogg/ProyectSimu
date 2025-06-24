@@ -7,9 +7,12 @@ int main() {
     sf::View view = window.getDefaultView();
     float zoomLevel = 1.0f;
 
-    std::string mapPath;
-    std::cout << "Ingrese la ruta absoluta o relativa del archivo de mapa (ej: C:\\Users\\tu_usuario\\Documents\\map.txt): ";
-    std::getline(std::cin, mapPath);
+    //std::string mapPath;
+    //std::cout << "Ingrese la ruta absoluta o relativa del archivo de mapa (ej: C:\\Users\\tu_usuario\\Documents\\map.txt): ";
+    //std::getline(std::cin, mapPath);
+
+    // Mapa por defecto si no se proporciona:
+    std::string mapPath = "/Users/sebastianmagg/Documents/ProyectSimu/ProyectSimu/Simu/map.txt";
 
     if (mapPath.empty()) {
         std::cerr << "No se proporcionó ninguna ruta. Saliendo...\n";
@@ -51,23 +54,23 @@ int main() {
     msg.setStyle(sf::Text::Bold);
     sf::FloatRect msgBounds = msg.getLocalBounds();
     msg.setOrigin(msgBounds.width / 2, msgBounds.height / 2);
-    msg.setPosition(window.getSize().x / 2.f, window.getSize().y / 2.f - 40.f);
+    msg.setPosition(window.getSize().x / 2.f, window.getSize().y / 2.f - 70.f);
 
     sf::RectangleShape replayBtn({ 180.f, 40.f });
-    replayBtn.setPosition(window.getSize().x / 2.f - 90.f, window.getSize().y / 2.f + 20.f);
+    replayBtn.setPosition(window.getSize().x / 2.f - 90.f, window.getSize().y / 2.f + 10.f);
     sf::Text replayText("Jugar de nuevo", font, 16);
     replayText.setFillColor(sf::Color(0, 245, 212));
     sf::FloatRect tb = replayText.getLocalBounds();
     replayText.setOrigin(tb.width / 2.f, tb.height / 2.f);
-    replayText.setPosition(window.getSize().x / 2.f, window.getSize().y / 2.f + 40.f);
+    replayText.setPosition(window.getSize().x / 2.f, window.getSize().y / 2.f + 30.f);
 
     sf::RectangleShape exitBtn({ 180.f, 40.f });
-    exitBtn.setPosition(window.getSize().x / 2.f - 90.f, window.getSize().y / 2.f + 70.f);
+    exitBtn.setPosition(window.getSize().x / 2.f - 90.f, window.getSize().y / 2.f + 60.f);
     sf::Text exitText("Salir del juego", font, 16);
     exitText.setFillColor(sf::Color(255, 80, 80));
     sf::FloatRect etb = exitText.getLocalBounds();
     exitText.setOrigin(etb.width / 2.f, etb.height / 2.f);
-    exitText.setPosition(window.getSize().x / 2.f, window.getSize().y / 2.f + 90.f);
+    exitText.setPosition(window.getSize().x / 2.f, window.getSize().y / 2.f + 80.f);
 
     bool autoMode = false;
     std::vector<sf::Vector2i> path;
@@ -180,16 +183,23 @@ int main() {
         // Texto de turno (HUD)
         sf::Text turnText("Turno: " + std::to_string(grid.getTurnCounter()), font, 16);
         turnText.setFillColor(sf::Color::White);
-        turnText.setPosition(10, 40);
+        turnText.setPosition(20, 40);
         window.draw(turnText);
 
         if (grid.isGameFinished()) {
+            sf::Text msg2("¡Puntaje final: " + std::to_string(grid.getTurnCounter()), font, 16);
+            msg2.setFillColor(sf::Color(0, 245, 212));
+            msg2.setStyle(sf::Text::Bold);
+            sf::FloatRect msg2Bounds = msg2.getLocalBounds();
+            msg2.setOrigin(msg2Bounds.width / 2, msg2Bounds.height / 2);
+            msg2.setPosition(window.getSize().x / 2.f, window.getSize().y / 2.f - 15.f);
             // Fondo semi-transparente
             sf::RectangleShape overlay(sf::Vector2f(window.getSize().x, window.getSize().y));
             overlay.setFillColor(sf::Color(0, 0, 0, 180));
             window.draw(overlay);
             window.draw(modal);
             window.draw(msg);
+            window.draw(msg2);
             window.draw(replayBtn);
             window.draw(replayText);
             window.draw(exitBtn);

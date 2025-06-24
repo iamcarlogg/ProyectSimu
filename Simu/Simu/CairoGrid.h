@@ -1,4 +1,4 @@
-include <SFML/Graphics.hpp>
+#include <SFML/Graphics.hpp>
 #include <vector>
 #include <cmath>
 
@@ -16,7 +16,7 @@ private:
         float b = size / 2.0f;
         float h = size * 0.87f;
 
-        // Puntos de un pentágono de El Cairo
+        // Puntos de un pentï¿½gono de El Cairo
         pent.setPoint(0, sf::Vector2f(x, y));
         pent.setPoint(1, sf::Vector2f(x + a, y));
         pent.setPoint(2, sf::Vector2f(x + a + b, y + h));
