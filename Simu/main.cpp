@@ -29,10 +29,10 @@ int main() {
 
     // Botón “Autocompletar”
     sf::RectangleShape btn({ 150, 40 });
-    btn.setPosition(10, 100);
+    btn.setPosition(20, 100);
     btn.setFillColor({ 50,50,50 });
     sf::Text btnText("Autocompletar", font, 18);
-    btnText.setPosition(15, 102);
+    btnText.setPosition(35, 108);
     btnText.setFillColor(sf::Color::White);
 
     // Botón de reinicio
@@ -192,7 +192,7 @@ int main() {
             msg2.setStyle(sf::Text::Bold);
             sf::FloatRect msg2Bounds = msg2.getLocalBounds();
             msg2.setOrigin(msg2Bounds.width / 2, msg2Bounds.height / 2);
-            msg2.setPosition(window.getSize().x / 2.f, window.getSize().y / 2.f - 15.f);
+            msg2.setPosition(window.getSize().x / 2.f, window.getSize().y / 2.f - 25.f);
             // Fondo semi-transparente
             sf::RectangleShape overlay(sf::Vector2f(window.getSize().x, window.getSize().y));
             overlay.setFillColor(sf::Color(0, 0, 0, 180));
