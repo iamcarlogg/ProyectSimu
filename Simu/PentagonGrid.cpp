@@ -32,10 +32,12 @@ PentagonGrid::PentagonGrid(const std::vector<std::string>& layout, float r, sf::
       rows(layout.size()), cols(layout.empty() ? 0 : layout[0].size()),
       turnCounter(0), moveCounter(0), movesToBreak(3), gameFinished(false)
 {
+    // Validar el layout
     float dx = r * 2.1f, dy = r * 1.8f;
     float gw = cols * dx + dx / 2, gh = rows * dy;
     float offX = (wsize.x - gw) / 2, offY = (wsize.y - gh) / 2;
 
+    // Validar dimensiones del layout
     grid.assign(rows, std::vector<PentagonCell>(cols));
     int idcnt = 0;
     for (int i = 0; i < rows; ++i) {
@@ -140,6 +142,7 @@ void PentagonGrid::resetGame() {
     gameFinished = false;
 }
 
+// Dibuja el laberinto
 void PentagonGrid::draw(sf::RenderWindow& w) {
     for (auto& row : grid) {
         for (auto& c : row) {
@@ -168,6 +171,7 @@ void PentagonGrid::draw(sf::RenderWindow& w) {
     }
 }
 
+// Dibuja el jugador en la celda actual
 void PentagonGrid::drawPlayer(sf::RenderWindow& w) {
     if (!playerCell || gameFinished) return;
     sf::CircleShape pl(radius / 2);
@@ -180,6 +184,7 @@ void PentagonGrid::drawPlayer(sf::RenderWindow& w) {
     w.draw(pl);
 }
 
+// Maneja el clic del mouse para mover al jugador o romper un muro
 void PentagonGrid::handleMouseClick(sf::Vector2f mp) {
     if (gameFinished) return;
 
@@ -231,6 +236,7 @@ std::vector<sf::Vector2i> PentagonGrid::solveWithBFS() {
     struct State { int r, c, tsb, par; };
     struct Par { int pr, pc, ptsb, ppar; };
 
+    // Inicializar BFS
     int sr = 0, sc = 0, er = 0, ec = 0;
     for (int i = 0;i < rows;i++) for (int j = 0;j < cols;j++) {
         if (grid[i][j].isStart) { sr = i; sc = j; }
@@ -248,6 +254,7 @@ std::vector<sf::Vector2i> PentagonGrid::solveWithBFS() {
     vis[sr][sc][init.tsb][init.par] = true;
     Q.push(init);
 
+    // Definir vecinos
     auto neighbors = [&](int i, int j) {
         std::vector<std::pair<int, int>> d = { {i,j - 1},{i,j + 1},{i - 1,j},{i + 1,j} };
         if (i % 2 == 0) { d.push_back({ i - 1,j - 1 }); d.push_back({ i + 1,j - 1 }); }
@@ -255,6 +262,7 @@ std::vector<sf::Vector2i> PentagonGrid::solveWithBFS() {
         return d;
     };
 
+    // BFS
     while (!Q.empty()) {
         auto [r, c, tsb, par] = Q.front(); Q.pop();
         if (r == er && c == ec) {
@@ -302,6 +310,7 @@ std::vector<sf::Vector2i> PentagonGrid::solveWithBFS() {
     return {}; // sin ruta
 }
 
+// Establece la posición del jugador según su ID
 void PentagonGrid::setPlayerPosition(int id) {
     if (auto it = idToCell.find(id); it != idToCell.end()) {
         for (auto& row : grid)

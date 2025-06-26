@@ -3,10 +3,12 @@
 #include <iostream>
 
 int main() {
+    // Inicialización de la ventana y vista
     sf::RenderWindow window({ 1920, 1080 }, "Laberinto");
     sf::View view = window.getDefaultView();
     float zoomLevel = 1.0f;
 
+    // Mapa ingresado desde el usuario (opcional):
     //std::string mapPath;
     //std::cout << "Ingrese la ruta absoluta o relativa del archivo de mapa (ej: C:\\Users\\tu_usuario\\Documents\\map.txt): ";
     //std::getline(std::cin, mapPath);
@@ -49,13 +51,15 @@ int main() {
     modal.setOutlineThickness(3.f);
     modal.setPosition((window.getSize().x - 400.f) / 2.f, (window.getSize().y - 200.f) / 2.f);
 
+    // Mensaje de victoria
     sf::Text msg("¡Has escapado del laberinto!", font, 20);
     msg.setFillColor(sf::Color(0, 245, 212));
     msg.setStyle(sf::Text::Bold);
     sf::FloatRect msgBounds = msg.getLocalBounds();
     msg.setOrigin(msgBounds.width / 2, msgBounds.height / 2);
     msg.setPosition(window.getSize().x / 2.f, window.getSize().y / 2.f - 70.f);
-
+    
+    // Boton de replay
     sf::RectangleShape replayBtn({ 180.f, 40.f });
     replayBtn.setPosition(window.getSize().x / 2.f - 90.f, window.getSize().y / 2.f + 10.f);
     sf::Text replayText("Jugar de nuevo", font, 16);
@@ -64,6 +68,7 @@ int main() {
     replayText.setOrigin(tb.width / 2.f, tb.height / 2.f);
     replayText.setPosition(window.getSize().x / 2.f, window.getSize().y / 2.f + 30.f);
 
+    // Boton de salir
     sf::RectangleShape exitBtn({ 180.f, 40.f });
     exitBtn.setPosition(window.getSize().x / 2.f - 90.f, window.getSize().y / 2.f + 60.f);
     sf::Text exitText("Salir del juego", font, 16);
@@ -72,13 +77,17 @@ int main() {
     exitText.setOrigin(etb.width / 2.f, etb.height / 2.f);
     exitText.setPosition(window.getSize().x / 2.f, window.getSize().y / 2.f + 80.f);
 
+    // Variables de estado del juego
     bool autoMode = false;
     std::vector<sf::Vector2i> path;
     std::size_t pathStep = 0;
     sf::Clock autoClock;
 
+    // Bucle principal del juego
     while (window.isOpen()) {
-        window.setView(view); 
+        window.setView(view);
+        
+        // Manejo de eventos y entrada del usuario
         sf::Event ev;
         while (window.pollEvent(ev)) {
             if (ev.type == sf::Event::Closed)
@@ -120,7 +129,7 @@ int main() {
                 }
             }
 
-            // --- ZOOM CON RUEDA DEL RATÓN ---
+            // ZOOM CON RUEDA DEL RATÓN 
             else if (ev.type == sf::Event::MouseWheelScrolled) {
                 if (ev.mouseWheelScroll.wheel == sf::Mouse::VerticalWheel) {
                     float delta = ev.mouseWheelScroll.delta;
@@ -139,6 +148,7 @@ int main() {
             if (autoClock.getElapsedTime().asSeconds() > 0.5f) {
                 auto [r, c] = path[pathStep];
                 auto& cell = grid.getCell(r, c);
+                // Calcular el centro del pentágono para hacer clic
                 auto getCenter = [&](const sf::ConvexShape& s) {
                     sf::Vector2f ctr = s.getPoint(0);
                     for (int i = 1; i < s.getPointCount(); ++i)
@@ -161,12 +171,14 @@ int main() {
             }
         }
 
-        // --- DIBUJAR ---
+        // DIBUJAR
+        // Vista y laberinto
         window.setView(view); // Laberinto con zoom
         window.clear(sf::Color(10, 15, 30));
         grid.draw(window);
         grid.drawPlayer(window);
 
+        // Dibujar botones
         window.setView(window.getDefaultView()); // HUD SIEMPRE FIJO
         window.draw(btn);
         window.draw(btnText);
@@ -186,7 +198,9 @@ int main() {
         turnText.setPosition(20, 40);
         window.draw(turnText);
 
+        // Si el juego ha terminado, mostramos el modal de victoria
         if (grid.isGameFinished()) {
+            //Mostrando el puntaje final
             sf::Text msg2("¡Puntaje final: " + std::to_string(grid.getTurnCounter()), font, 16);
             msg2.setFillColor(sf::Color(0, 245, 212));
             msg2.setStyle(sf::Text::Bold);
