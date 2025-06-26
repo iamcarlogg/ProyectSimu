@@ -7,6 +7,7 @@ Este proyecto representa un laberinto basado en una malla de pentágonos utiliza
 2. Construir una lista de adyacencia de los pentágonos transitables.
 3. Identificar y manipular el nodo de inicio y el nodo final.
 4. Exportar la lista de adyacencia a un archivo `.txt`.
+5. Realizar un autocompletado por medio de BFS
 
 ---
 
@@ -33,49 +34,34 @@ Cada línea del archivo representa una fila de la cuadrícula. Los caracteres pe
 ---
 
 ## Importar mapa desde archivo
+Antes de iniciar el juego, se pedira en consola ingresar la ruta del archivo de mapa en forma de ruta absoluta o ruta relativa.
+Ejemplo:
 
-```cpp
-std::vector<std::string> layout = PentagonGrid::loadLayoutFromFile("map.txt");
-PentagonGrid grid(layout, 30.0f, window.getSize());
+```bash
+
+C:\Users\usuarioRandom\Desktop\map.txt
+||
+.\map.txt
 ```
+## Como Jugar
 
----
+1) Para moverte necesitaras hacer click derecho en una celda libre.
 
-## Obtener lista de adyacencia
+2) Hay celdas que en turno par estan bloqueadas y en turno impar son transitables.
 
-Una vez creado el objeto `PentagonGrid`, puedes obtener la lista de adyacencia usando:
+3) Cada 4 turnos podas romper un muro arbitrario.
 
-```cpp
-const std::vector<std::vector<int>>& adjList = grid.getAdjacencyList();
-```
+4) Al momento de llegar a la meta, ganaras.
 
-Cada nodo tiene un ID único, y la lista contiene los vecinos a los que puede moverse.
+### Controles
 
----
-
-## Exportar lista de adyacencia
-
-```cpp
-grid.exportAdjacencyListToFile("adyacencia.txt");
-```
-
-Esto generará un archivo con la representación del grafo. Por ejemplo:
-
-```
-0: 1 6
-1: 0 2 7
-...
-```
-
----
-
-## Nodo del jugador (inicio) y nodo destino (final)
-
-- `grid.getPlayerNodeId()` devuelve el ID del nodo donde está el jugador actualmente.
-- `grid.getEndNodeId()` devuelve el ID del nodo de destino (`b`).
+1) click derecho: Control principal, todas las acciones se realizan por medio de este click.
+2) Rueda del ratón: zoom in y zoom out
 
 
----
+
+
+
 
 ## Requisitos
 
