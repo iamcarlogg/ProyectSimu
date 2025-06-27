@@ -1,6 +1,29 @@
 ﻿#include "./Simu/PentagonGrid.h"
 #include <SFML/Graphics.hpp>
 #include <iostream>
+#include <sstream>
+
+std::string wrapText(const std::string& text, const sf::Font& font, unsigned int charSize, float maxWidth) {
+    std::istringstream iss(text);
+    std::string word, output, line;
+    while (iss >> word) {
+        std::string testLine = line.empty() ? word : line + " " + word;
+        sf::Text testText(testLine, font, charSize);
+        if (testText.getLocalBounds().width > maxWidth) {
+            if (!output.empty()) output += "\n";
+            output += line;
+            line = word;
+        }
+        else {
+            line = testLine;
+        }
+    }
+    if (!line.empty()) {
+        if (!output.empty()) output += "\n";
+        output += line;
+    }
+    return output;
+}
 
 int main() {
     sf::RenderWindow window({ 1920, 1080 }, "Laberinto");
@@ -23,6 +46,60 @@ int main() {
     sf::Font font;
     if (!font.loadFromFile("arial.ttf"))
         std::cerr << "No pude cargar arial.ttf\n";
+
+    std::string historia =
+        "Es el 2225, en Hellador.\n"
+        "Eres Pepe el cyberdinosaurio rescatado de la muerte causada por algoritmos en 2024.\n"
+        "Estás modificado genéticamente porque tienes que ayudar a la resistencia para acabar con la dictadura del ejército del dictador, ya que en tus genes tienes todos los datos necesarios para acabar con esta dictadura.\n"
+        "Luego de tu captura lograste llegar a los ductos de ventilación del KEKOT, pero cada cierto tiempo hay unas plataformas que suben y te tapan tu camino, pero si subes a uno de ellos puedes volver a bajar.\n"
+        "A su vez, al ser un dinosaurio modificado genéticamente tienes la habilidad de generar pequeños overflows cada 4 turnos, lo que te permitirá romper un muro.\n"
+        "Trata de llegar al fin del laberinto que se forma en los ductos de ventilación.\n\n"
+        "Buena suerte, recuerda los consejos de Roque Dalton y salva a nuestra patria.";
+
+    float modalW = 750.f, modalH = 500.f;
+    sf::RectangleShape storyModal({ modalW, modalH });
+    storyModal.setFillColor(sf::Color(28, 34, 50));
+    storyModal.setOutlineColor(sf::Color(90, 200, 250));
+    storyModal.setOutlineThickness(3.f);
+    storyModal.setPosition((window.getSize().x - modalW) / 2.f, (window.getSize().y - modalH) / 2.f);
+
+    sf::Text titulo("CiberDinosaurio", font, 40);
+    titulo.setFillColor(sf::Color(0, 245, 212));
+    titulo.setStyle(sf::Text::Bold);
+    sf::FloatRect tRect = titulo.getLocalBounds();
+    titulo.setPosition(
+        storyModal.getPosition().x + (modalW - tRect.width) / 2.f,
+        storyModal.getPosition().y + 24.f
+    );
+
+    float marginX = 38.f;
+    float marginY = 80.f; // deja espacio arriba para el título
+    std::string historiaWrap = wrapText(historia, font, 22, modalW - 2 * marginX);
+
+    sf::Text storyText(historiaWrap, font, 22);
+    storyText.setFillColor(sf::Color(245, 245, 245));
+    storyText.setLineSpacing(1.18f);
+    storyText.setPosition(storyModal.getPosition().x + marginX, storyModal.getPosition().y + marginY);
+
+    // Botón ahora va DEBAJO del recuadro
+    float btnWidth = 270.f, btnHeight = 58.f;
+    float btnX = storyModal.getPosition().x + (modalW - btnWidth) / 2.f;
+    float btnY = storyModal.getPosition().y + modalH + 20.f;
+    sf::RectangleShape storyBtn({ btnWidth, btnHeight });
+    storyBtn.setPosition(btnX, btnY);
+    storyBtn.setFillColor(sf::Color::White);
+    storyBtn.setOutlineColor(sf::Color(0, 245, 212));
+    storyBtn.setOutlineThickness(2.2f);
+
+    sf::Text storyBtnText("Comenzar aventura", font, 26);
+    storyBtnText.setFillColor(sf::Color(0, 245, 212));
+    sf::FloatRect btnTextRect = storyBtnText.getLocalBounds();
+    storyBtnText.setPosition(
+        btnX + (btnWidth - btnTextRect.width) / 2.f,
+        btnY + (btnHeight - btnTextRect.height) / 2.f - 6.f
+    );
+
+    bool showStory = true;
 
     // Botón “Autocompletar”
     sf::RectangleShape btn({ 150, 40 });
@@ -78,6 +155,17 @@ int main() {
         window.setView(view); 
         sf::Event ev;
         while (window.pollEvent(ev)) {
+
+            if (showStory && ev.type == sf::Event::MouseButtonPressed && ev.mouseButton.button == sf::Mouse::Left) {
+                sf::Vector2f mp = window.mapPixelToCoords({ ev.mouseButton.x, ev.mouseButton.y });
+                if (storyBtn.getGlobalBounds().contains(mp)) {
+                    showStory = false;
+                    continue;
+                }
+            }
+            if (showStory)
+                continue;
+
             if (ev.type == sf::Event::Closed)
                 window.close();
 
@@ -129,6 +217,20 @@ int main() {
                     view.zoom(zoomLevel);
                 }
             }
+        }
+
+        if (showStory) {
+            window.clear(sf::Color(10, 15, 30));
+            sf::RectangleShape overlay(sf::Vector2f(window.getSize().x, window.getSize().y));
+            overlay.setFillColor(sf::Color(0, 0, 0, 180));
+            window.draw(overlay);
+            window.draw(storyModal);
+            window.draw(titulo);
+            window.draw(storyText);
+            window.draw(storyBtn);
+            window.draw(storyBtnText);
+            window.display();
+            continue;
         }
 
         // Modo automático: avanzamos un paso cada 0.5s

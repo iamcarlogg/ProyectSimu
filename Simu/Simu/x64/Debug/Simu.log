@@ -1,29 +1,47 @@
 ﻿  main.cpp
-C:\Users\carlo\Desktop\ProyectSimu\Simu\Simu\PentagonGrid.h(130,27): warning C4267: '=': conversión de 'size_t' a 'int'; posible pérdida de datos
+C:\Users\isira\Desktop\Proyecto Simu\a\ProyectSimu\Simu\Simu\PentagonGrid.h(130,27): warning C4267: '=': conversión de 'size_t' a 'int'; posible pérdida de datos
   (compilando archivo de origen "main.cpp")
   
-C:\Users\carlo\Desktop\ProyectSimu\Simu\Simu\PentagonGrid.h(131,31): warning C4267: '=': conversión de 'size_t' a 'int'; posible pérdida de datos
+C:\Users\isira\Desktop\Proyecto Simu\a\ProyectSimu\Simu\Simu\PentagonGrid.h(131,28): warning C4267: '=': conversión de 'size_t' a 'int'; posible pérdida de datos
   (compilando archivo de origen "main.cpp")
   
-C:\Users\carlo\Desktop\ProyectSimu\Simu\Simu\PentagonGrid.h(226,46): warning C4267: '=': conversión de 'size_t' a 'int'; posible pérdida de datos
+C:\Users\isira\Desktop\Proyecto Simu\a\ProyectSimu\Simu\Simu\PentagonGrid.h(226,46): warning C4267: '=': conversión de 'size_t' a 'int'; posible pérdida de datos
   (compilando archivo de origen "main.cpp")
   
-C:\Users\carlo\Desktop\ProyectSimu\Simu\main.cpp(188,89): warning C4244: 'argumento': conversión de 'T' a 'T'; posible pérdida de datos
-C:\Users\carlo\Desktop\ProyectSimu\Simu\main.cpp(188,89): warning C4244:         with
-C:\Users\carlo\Desktop\ProyectSimu\Simu\main.cpp(188,89): warning C4244:         [
-C:\Users\carlo\Desktop\ProyectSimu\Simu\main.cpp(188,89): warning C4244:             T=unsigned int
-C:\Users\carlo\Desktop\ProyectSimu\Simu\main.cpp(188,89): warning C4244:         ]
-C:\Users\carlo\Desktop\ProyectSimu\Simu\main.cpp(188,89): warning C4244:         and
-C:\Users\carlo\Desktop\ProyectSimu\Simu\main.cpp(188,89): warning C4244:         [
-C:\Users\carlo\Desktop\ProyectSimu\Simu\main.cpp(188,89): warning C4244:             T=float
-C:\Users\carlo\Desktop\ProyectSimu\Simu\main.cpp(188,89): warning C4244:         ]
-C:\Users\carlo\Desktop\ProyectSimu\Simu\main.cpp(188,69): warning C4244: 'argumento': conversión de 'T' a 'T'; posible pérdida de datos
-C:\Users\carlo\Desktop\ProyectSimu\Simu\main.cpp(188,69): warning C4244:         with
-C:\Users\carlo\Desktop\ProyectSimu\Simu\main.cpp(188,69): warning C4244:         [
-C:\Users\carlo\Desktop\ProyectSimu\Simu\main.cpp(188,69): warning C4244:             T=unsigned int
-C:\Users\carlo\Desktop\ProyectSimu\Simu\main.cpp(188,69): warning C4244:         ]
-C:\Users\carlo\Desktop\ProyectSimu\Simu\main.cpp(188,69): warning C4244:         and
-C:\Users\carlo\Desktop\ProyectSimu\Simu\main.cpp(188,69): warning C4244:         [
-C:\Users\carlo\Desktop\ProyectSimu\Simu\main.cpp(188,69): warning C4244:             T=float
-C:\Users\carlo\Desktop\ProyectSimu\Simu\main.cpp(188,69): warning C4244:         ]
-  Simu.vcxproj -> C:\Users\carlo\Desktop\ProyectSimu\Simu\x64\Debug\Simu.exe
+C:\Users\isira\Desktop\Proyecto Simu\a\ProyectSimu\Simu\main.cpp(224,89): warning C4244: 'argumento': conversión de 'T' a 'T'; posible pérdida de datos
+C:\Users\isira\Desktop\Proyecto Simu\a\ProyectSimu\Simu\main.cpp(224,89): warning C4244:         with
+C:\Users\isira\Desktop\Proyecto Simu\a\ProyectSimu\Simu\main.cpp(224,89): warning C4244:         [
+C:\Users\isira\Desktop\Proyecto Simu\a\ProyectSimu\Simu\main.cpp(224,89): warning C4244:             T=unsigned int
+C:\Users\isira\Desktop\Proyecto Simu\a\ProyectSimu\Simu\main.cpp(224,89): warning C4244:         ]
+C:\Users\isira\Desktop\Proyecto Simu\a\ProyectSimu\Simu\main.cpp(224,89): warning C4244:         and
+C:\Users\isira\Desktop\Proyecto Simu\a\ProyectSimu\Simu\main.cpp(224,89): warning C4244:         [
+C:\Users\isira\Desktop\Proyecto Simu\a\ProyectSimu\Simu\main.cpp(224,89): warning C4244:             T=float
+C:\Users\isira\Desktop\Proyecto Simu\a\ProyectSimu\Simu\main.cpp(224,89): warning C4244:         ]
+C:\Users\isira\Desktop\Proyecto Simu\a\ProyectSimu\Simu\main.cpp(224,69): warning C4244: 'argumento': conversión de 'T' a 'T'; posible pérdida de datos
+C:\Users\isira\Desktop\Proyecto Simu\a\ProyectSimu\Simu\main.cpp(224,69): warning C4244:         with
+C:\Users\isira\Desktop\Proyecto Simu\a\ProyectSimu\Simu\main.cpp(224,69): warning C4244:         [
+C:\Users\isira\Desktop\Proyecto Simu\a\ProyectSimu\Simu\main.cpp(224,69): warning C4244:             T=unsigned int
+C:\Users\isira\Desktop\Proyecto Simu\a\ProyectSimu\Simu\main.cpp(224,69): warning C4244:         ]
+C:\Users\isira\Desktop\Proyecto Simu\a\ProyectSimu\Simu\main.cpp(224,69): warning C4244:         and
+C:\Users\isira\Desktop\Proyecto Simu\a\ProyectSimu\Simu\main.cpp(224,69): warning C4244:         [
+C:\Users\isira\Desktop\Proyecto Simu\a\ProyectSimu\Simu\main.cpp(224,69): warning C4244:             T=float
+C:\Users\isira\Desktop\Proyecto Simu\a\ProyectSimu\Simu\main.cpp(224,69): warning C4244:         ]
+C:\Users\isira\Desktop\Proyecto Simu\a\ProyectSimu\Simu\main.cpp(290,89): warning C4244: 'argumento': conversión de 'T' a 'T'; posible pérdida de datos
+C:\Users\isira\Desktop\Proyecto Simu\a\ProyectSimu\Simu\main.cpp(290,89): warning C4244:         with
+C:\Users\isira\Desktop\Proyecto Simu\a\ProyectSimu\Simu\main.cpp(290,89): warning C4244:         [
+C:\Users\isira\Desktop\Proyecto Simu\a\ProyectSimu\Simu\main.cpp(290,89): warning C4244:             T=unsigned int
+C:\Users\isira\Desktop\Proyecto Simu\a\ProyectSimu\Simu\main.cpp(290,89): warning C4244:         ]
+C:\Users\isira\Desktop\Proyecto Simu\a\ProyectSimu\Simu\main.cpp(290,89): warning C4244:         and
+C:\Users\isira\Desktop\Proyecto Simu\a\ProyectSimu\Simu\main.cpp(290,89): warning C4244:         [
+C:\Users\isira\Desktop\Proyecto Simu\a\ProyectSimu\Simu\main.cpp(290,89): warning C4244:             T=float
+C:\Users\isira\Desktop\Proyecto Simu\a\ProyectSimu\Simu\main.cpp(290,89): warning C4244:         ]
+C:\Users\isira\Desktop\Proyecto Simu\a\ProyectSimu\Simu\main.cpp(290,69): warning C4244: 'argumento': conversión de 'T' a 'T'; posible pérdida de datos
+C:\Users\isira\Desktop\Proyecto Simu\a\ProyectSimu\Simu\main.cpp(290,69): warning C4244:         with
+C:\Users\isira\Desktop\Proyecto Simu\a\ProyectSimu\Simu\main.cpp(290,69): warning C4244:         [
+C:\Users\isira\Desktop\Proyecto Simu\a\ProyectSimu\Simu\main.cpp(290,69): warning C4244:             T=unsigned int
+C:\Users\isira\Desktop\Proyecto Simu\a\ProyectSimu\Simu\main.cpp(290,69): warning C4244:         ]
+C:\Users\isira\Desktop\Proyecto Simu\a\ProyectSimu\Simu\main.cpp(290,69): warning C4244:         and
+C:\Users\isira\Desktop\Proyecto Simu\a\ProyectSimu\Simu\main.cpp(290,69): warning C4244:         [
+C:\Users\isira\Desktop\Proyecto Simu\a\ProyectSimu\Simu\main.cpp(290,69): warning C4244:             T=float
+C:\Users\isira\Desktop\Proyecto Simu\a\ProyectSimu\Simu\main.cpp(290,69): warning C4244:         ]
+  Simu.vcxproj -> C:\Users\isira\Desktop\Proyecto Simu\a\ProyectSimu\Simu\x64\Debug\Simu.exe
